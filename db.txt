@@ -1,1 +1,1 @@
-{"Giopanni": 2, "Luca": 2, "Fresh": 2, "Vale": 1}
+{"Giopanni": 4, "Luca": 3, "Fresh": 2, "Vale": 7}

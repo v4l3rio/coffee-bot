@@ -10,6 +10,7 @@ with open("db.txt", "r") as fp:
     nomi = json.load(fp)
 
 in_stage = ""
+newNomi = []
 
 def shuffleDictionary(d):
     l = list(d.items())
@@ -20,6 +21,12 @@ def modStage(str):
     global in_stage
     in_stage = str
 
+def extract_arg(arg):
+    if len(arg.split()) > 1:
+        return arg.split()[1:][0]
+    else:
+        return "1"
+
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -27,13 +34,15 @@ def send_welcome(message):
     but2 = types.KeyboardButton("/conferma")
     but3 = types.KeyboardButton("/situazione")
     markup.add(but1, but2, but3)
-    bot.reply_to(message, "Ciao! Benvenuto nel bot che dice chi paga il caffe ogni giorno!", parse_mode='html', reply_markup=markup)
+    bot.reply_to(message, "Ciao! Benvenuto nel bot che dice chi paga il caffe ogni giorno e ricorda a Valerio che non ha pubblicato!", parse_mode='html', reply_markup=markup)
 
 @bot.message_handler(commands=['chipaga', 'caffe', "dimmichipaga", "alternativa"])
 def send_coffie(message):
-    newNomi = {}
-    newNomi = shuffleDictionary(nomi)
-    modStage(min(newNomi, key=newNomi.get))
+    global newNomi
+    if not newNomi or in_stage == "":
+        newNomi = list(sorted(shuffleDictionary(nomi).items(), key=lambda item: item[1]))
+    modStage(newNomi[0][0])
+    newNomi = newNomi[1:]
     bot.reply_to(message, in_stage)
     
 @bot.message_handler(commands=['conferma', 'hapagato', "ok"])
@@ -41,10 +50,17 @@ def send_confirm(message):
     if in_stage == "":
         bot.reply_to(message, "Coglione, devi prima far generare qualcuno "+in_stage)
     else:
-        nomi[in_stage] += 1
+        n_coffee = extract_arg(message.text)
+        if n_coffee.isnumeric():
+            nomi[in_stage] += int(n_coffee)
+        else:
+            nomi[in_stage] += 1
         with open("db.txt", "w") as fp:
             json.dump(nomi, fp)
-        bot.reply_to(message, "Ok, "+in_stage+" ha pagato!")
+        if n_coffee.isnumeric():
+            bot.reply_to(message, "Ok, "+in_stage+" ha pagato "+n_coffee+" caffè!")
+        else:
+            bot.reply_to(message, "Ok, "+in_stage+" ha pagato! (Ci hai provato merda, +1)")
         modStage("")
         
 @bot.message_handler(commands=['situazione', 'riassunto', "totale"])

@@ -31,10 +31,13 @@ def extract_arg(arg):
 def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     but1 = types.KeyboardButton("/chipaga")
-    but2 = types.KeyboardButton("/conferma")
-    but3 = types.KeyboardButton("/situazione")
-    markup.add(but1, but2, but3)
-    bot.reply_to(message, "Ciao! Benvenuto nel bot che dice chi paga il caffe ogni giorno e ricorda a Valerio che non ha pubblicato!", parse_mode='html', reply_markup=markup)
+    but2 = types.KeyboardButton("/conferma 1")
+    but3 = types.KeyboardButton("/conferma 2")
+    but4 = types.KeyboardButton("/conferma 3")
+    but5 = types.KeyboardButton("/conferma 4")
+    but6 = types.KeyboardButton("/situazione")
+    markup.add(but1, but2, but3, but4, but5, but6)
+    bot.reply_to(message, "Ciao! Benvenuto nel bot che dice chi paga il caffe ogni giorno!", parse_mode='html', reply_markup=markup)
 
 @bot.message_handler(commands=['chipaga', 'caffe', "dimmichipaga", "alternativa"])
 def send_coffie(message):
@@ -66,6 +69,10 @@ def send_confirm(message):
 @bot.message_handler(commands=['situazione', 'riassunto', "totale"])
 def send_confirm(message):
     bot.reply_to(message, str(nomi))
+    
+@bot.message_handler(commands=['insulta'])
+def send_confirm(message):
+    bot.reply_to(message, "Luca non ha pubblicato!")
 
 
 bot.infinity_polling()

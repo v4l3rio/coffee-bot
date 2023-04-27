@@ -23,7 +23,7 @@ def modStage(str):
 
 def extract_arg(arg):
     if len(arg.split()) > 1:
-        return arg.split()[1:][0]
+        return arg.split()[1]
     else:
         return "1"
 
@@ -31,13 +31,14 @@ def extract_arg(arg):
 def send_welcome(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     but1 = types.KeyboardButton("/chipaga")
-    but2 = types.KeyboardButton("/conferma 1")
-    but3 = types.KeyboardButton("/conferma 2")
-    but4 = types.KeyboardButton("/conferma 3")
-    but5 = types.KeyboardButton("/conferma 4")
-    but6 = types.KeyboardButton("/situazione")
-    markup.add(but1, but2, but3, but4, but5, but6)
-    bot.reply_to(message, "Ciao! Benvenuto nel bot che dice chi paga il caffe ogni giorno!", parse_mode='html', reply_markup=markup)
+    but2 = types.KeyboardButton("/situazione")
+    but3 = types.KeyboardButton("/conferma 1")
+    but4 = types.KeyboardButton("/conferma 2")
+    but5 = types.KeyboardButton("/conferma 3")
+    but6 = types.KeyboardButton("/conferma 4")
+    but7 = types.KeyboardButton("/conferma 5")
+    markup.add(but1, but2, but3, but4, but5, but6, but7)
+    bot.reply_to(message, "Ciao! Benvenuto nel bot che dice chi paga il caffe ogni giorno e ricorda a Valerio che non ha pubblicato!", parse_mode='html', reply_markup=markup)
 
 @bot.message_handler(commands=['chipaga', 'caffe', "dimmichipaga", "alternativa"])
 def send_coffie(message):
@@ -54,16 +55,19 @@ def send_confirm(message):
         bot.reply_to(message, "Coglione, devi prima far generare qualcuno "+in_stage)
     else:
         n_coffee = extract_arg(message.text)
-        if n_coffee.isnumeric():
-            nomi[in_stage] += int(n_coffee)
+        if n_coffee.lstrip("-").isnumeric():
+            add = int(n_coffee)
+            if add < 1:
+                add = 1
+            nomi[in_stage] += add
+            with open("db.txt", "w") as fp:
+                json.dump(nomi, fp)
+            if int(n_coffee) < 1:
+                bot.reply_to(message, "Ci hai provato, ma "+in_stage+" ha comunque pagato 1 caffè, ti meriti una chiacchierata con la Damy")
+            else:
+                bot.reply_to(message, "Ok, "+in_stage+" ha pagato "+n_coffee+" caffè!")
         else:
-            nomi[in_stage] += 1
-        with open("db.txt", "w") as fp:
-            json.dump(nomi, fp)
-        if n_coffee.isnumeric():
-            bot.reply_to(message, "Ok, "+in_stage+" ha pagato "+n_coffee+" caffè!")
-        else:
-            bot.reply_to(message, "Ok, "+in_stage+" ha pagato! (Ci hai provato merda, +1)")
+            bot.reply_to(message, in_stage+" non ha pagato! (Ci hai provato, scommetto che le tue pubblicazioni sono le stesse di Verio, merda), nel dubbio -2 a Verio")
         modStage("")
         
 @bot.message_handler(commands=['situazione', 'riassunto', "totale"])
@@ -72,7 +76,8 @@ def send_confirm(message):
     
 @bot.message_handler(commands=['insulta'])
 def send_confirm(message):
-    bot.reply_to(message, "Luca non ha pubblicato!")
+    shamer = list(shuffleDictionary(nomi).items())[0][0]
+    bot.reply_to(message, shamer + " come al solito non ha pubblicato! Vergognati Vezio (so che anche te sicuramente non l'hai fatto)")
 
 
 bot.infinity_polling()

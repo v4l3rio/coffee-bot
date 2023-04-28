@@ -13,13 +13,13 @@ in_stage = ""
 newNomi = []
 
 lookup = {
-    tuple(str(["gio", "giopain", "giopanni", "giova", "giovanni", "giopainnogain", "g"])): "Giopanni",
-    tuple(str(["valerio", "verio", "vezio", "v", "vale", "mrnopubblicazioni", "amicodimucciaccia", "collolungo",
+    tuple(["gio", "giopain", "giopanni", "giova", "giovanni", "giopainnogain", "g"]): "Giopanni",
+    tuple(["valerio", "verio", "vezio", "v", "vale", "mrnopubblicazioni", "amicodimucciaccia", "collolungo",
      "vizio", "dizio", "zio", "pubblicazionizero", "scheggia", "martediinsalotto", "trizio",
-     "frizio"])): "Vale",
-    tuple(str(["francesco", "f", "fresh", "tresh", "trash", "fresco", "tesco", "pesco", "teschio",
-     "cesco", "franz", "root", "rootmaster", "mesco", "muschio", "muschi", "lesto"])): "Fresh",
-    tuple(str(["luca", "lu", "l", "damy", "damylover", "dioporco", "rubbo", "r", "nplinspace"])): "Luca"
+     "frizio"]): "Vale",
+    tuple(["francesco", "f", "fresh", "tresh", "trash", "fresco", "tesco", "pesco", "teschio",
+     "cesco", "franz", "root", "rootmaster", "mesco", "muschio", "muschi", "lesto"]): "Fresh",
+    tuple(["luca", "lu", "l", "damy", "damylover", "dioporco", "rubbo", "r", "nplinspace"]): "Luca"
 }
 
 def shuffleDictionary(d):
@@ -74,11 +74,13 @@ def send_coffie(message):
             if inputName.lower() in key:
                 newName = lookup[key]
                 break
-        modStage(newName)
-        bot.reply_to(message, "Quanti ne coppa " + newName + "?")
+        if newName != "":
+            modStage(newName)
+            bot.reply_to(message, "Quanti ne coppa " + newName + "?")
+        else:
+            bot.reply_to(message, "We napoli, tra tutti i nomi validi hai scelto \"" + in_stage + "\" scemo, se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
     else:
-        bot.reply_to(message, "Dio cane, tra tutti i nomi validi ne hai scelto " + in_stage + ", scemo,\
-                     se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
+        bot.reply_to(message, "We napoli, tra tutti i nomi validi hai scelto \"" + in_stage + "\" scemo, se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
 
 @bot.message_handler(commands=['conferma', 'hapagato', "ok"])
 def send_confirm(message):

@@ -4,13 +4,23 @@ import telebot
 from telebot import types
 f = open("api_key.txt", "r") #Secret API_KEY
 TOKEN = f.read()
-bot = telebot.TeleBot(TOKEN)
+bot = telebot.TeleBot(TOKEN.strip())
 
 with open("db.txt", "r") as fp:
     nomi = json.load(fp)
 
 in_stage = ""
 newNomi = []
+
+lookup = {
+    tuple(str(["gio", "giopain", "giopanni", "giova", "giovanni", "giopainnogain", "g"])): "Giopanni",
+    tuple(str(["valerio", "verio", "vezio", "v", "vale", "mrnopubblicazioni", "amicodimucciaccia", "collolungo",
+     "vizio", "dizio", "zio", "pubblicazionizero", "scheggia", "martediinsalotto", "trizio",
+     "frizio"])): "Vale",
+    tuple(str(["francesco", "f", "fresh", "tresh", "trash", "fresco", "tesco", "pesco", "teschio",
+     "cesco", "franz", "root", "rootmaster", "mesco", "muschio", "muschi", "lesto"])): "Fresh",
+    tuple(str(["luca", "lu", "l", "damy", "damylover", "dioporco", "rubbo", "r", "nplinspace"])): "Luca"
+}
 
 def shuffleDictionary(d):
     l = list(d.items())
@@ -21,11 +31,17 @@ def modStage(str):
     global in_stage
     in_stage = str
 
-def extract_arg(arg):
+def extract_coffe_quantity(arg):
     if len(arg.split()) > 1:
         return arg.split()[1]
     else:
         return "1"
+    
+def extract_payer_name(arg):
+    if len(arg.split()) > 1:
+        return arg.split()[1]
+    else:
+        return ""
 
 @bot.message_handler(commands=['start', 'help'])
 def send_welcome(message):
@@ -49,12 +65,27 @@ def send_coffie(message):
     newNomi = newNomi[1:]
     bot.reply_to(message, in_stage)
     
+@bot.message_handler(commands=['paga'])
+def send_coffie(message):
+    inputName = extract_payer_name(message.text)
+    newName = ""
+    if inputName != "":
+        for key in lookup.keys():
+            if inputName.lower() in key:
+                newName = lookup[key]
+                break
+        modStage(newName)
+        bot.reply_to(message, "Quanti ne coppa " + newName + "?")
+    else:
+        bot.reply_to(message, "Dio cane, tra tutti i nomi validi ne hai scelto " + in_stage + ", scemo,\
+                     se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
+
 @bot.message_handler(commands=['conferma', 'hapagato', "ok"])
 def send_confirm(message):
     if in_stage == "":
         bot.reply_to(message, "Coglione, devi prima far generare qualcuno "+in_stage)
     else:
-        n_coffee = extract_arg(message.text)
+        n_coffee = extract_coffe_quantity(message.text)
         if n_coffee.lstrip("-").isnumeric():
             add = int(n_coffee)
             if add < 1:
@@ -78,6 +109,5 @@ def send_confirm(message):
 def send_confirm(message):
     shamer = list(shuffleDictionary(nomi).items())[0][0]
     bot.reply_to(message, shamer + " come al solito non ha pubblicato! Vergognati Vezio (so che anche te sicuramente non l'hai fatto)")
-
 
 bot.infinity_polling()

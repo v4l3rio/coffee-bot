@@ -22,6 +22,11 @@ lookup = {
     tuple(["luca", "lu", "l", "damy", "damylover", "dioporco", "rubbo", "r", "nplinspace"]): "Luca"
 }
 
+bestemmia_nome = [("Dio", "S", "M"), ("La Madonna", "S", "F"), ("Gesù", "S", "M"), ("La Sacra sindone", "S", "F"), ("Cristo", "S", "M"), ("I sandaletti di cristo", "P", "M"),
+                  ("Padre Pio", "S", "M"), ("Angeli in colonna", "P", "M")]
+bestemmia_cosa = [("Cane", "Cagna", "Cani"), ("Porco", "Porca", "Porci"), ("Mostro", "Mostra", "Mostri"), ("Culo magnetico nella valle dei cazzi di ferro", "Culo magnetico nella valle dei cazzi di ferro", "Culi magnetici nella valle dei cazzi di ferro"),
+                    ("Merda", "Merda", "Merde"), ("Bastardo", "Bastarda", "Bastardi")]
+
 def shuffleDictionary(d):
     l = list(d.items())
     random.shuffle(l)
@@ -78,9 +83,9 @@ def send_coffie(message):
             modStage(newName)
             bot.reply_to(message, "Quanti ne coppa " + newName + "?")
         else:
-            bot.reply_to(message, "We napoli, tra tutti i nomi validi hai scelto \"" + in_stage + "\" scemo, se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
+            bot.reply_to(message, "We napoli, tra tutti i nomi validi hai scelto \"" + inputName + "\" scemo, se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
     else:
-        bot.reply_to(message, "We napoli, tra tutti i nomi validi hai scelto \"" + in_stage + "\" scemo, se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
+        bot.reply_to(message, "We napoli, tra tutti i nomi validi hai scelto \"" + inputName + "\" scemo, se mai pubblicassi te riuscirebbero proprio tutti, ma tanto non lo farai.")
 
 @bot.message_handler(commands=['conferma', 'hapagato', "ok"])
 def send_confirm(message):
@@ -110,6 +115,26 @@ def send_confirm(message):
 @bot.message_handler(commands=['insulta'])
 def send_confirm(message):
     shamer = list(shuffleDictionary(nomi).items())[0][0]
-    bot.reply_to(message, shamer + " come al solito non ha pubblicato! Vergognati Vezio (so che anche te sicuramente non l'hai fatto)")
+    bot.reply_to(message, shamer + " come al solito non ha pubblicato!")
+
+@bot.message_handler(commands=['bestemmia'])
+def send_confirm(message):
+    who = random.choice(bestemmia_nome)
+    what = random.choice(bestemmia_cosa)
+    if who[1] == "S":
+        if who[2] == "M":
+            what = what[0]
+        else:
+            what = what[1]
+    else:
+        what = what[2]
+    who = who[0]
+    rev = random.choice([True, False])
+    if rev:
+        reply = what + " " + who.lower()
+    else:
+        reply = who + " " + what.lower()
+
+    bot.reply_to(message, reply)
 
 bot.infinity_polling()
